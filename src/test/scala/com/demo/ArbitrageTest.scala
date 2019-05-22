@@ -1,12 +1,13 @@
 package com.demo
 
 import com.demo.Currency._
+import com.demo.TestBuilder._
 import com.demo.exchange._
-import org.mockito.scalatest.MockitoSugar
+import org.mockito.ArgumentMatchersSugar
+import org.mockito.scalatest.IdiomaticMockito
 import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
-import TestBuilder._
 
-class ArbitrageTest extends FeatureSpec with GivenWhenThen with MockitoSugar with Matchers with TestDsl {
+class ArbitrageTest extends FeatureSpec with GivenWhenThen with IdiomaticMockito with ArgumentMatchersSugar with Matchers with TestDsl with Equalities {
 
   val exchangeConnector = mock[ExchangeConnector]
   implicit val oms      = new OMS(exchangeConnector)
@@ -23,19 +24,19 @@ class ArbitrageTest extends FeatureSpec with GivenWhenThen with MockitoSugar wit
       onMarketData(ETH / USD, bids = Seq(50.ETH at 250.USD))
 
       Then("we send an order to buy 1.27.BTC at 7900.USD")
-      verify(exchangeConnector).executeOnExchange(order(1.27.BTC at 7900.USD, "ourId1", Side.Bid))
+      exchangeConnector.executeOnExchange(order(1.27.BTC at 7900.USD, "ourId1", Side.Bid)) was called
 
       When("the market fills the first order")
       onMarketReport(1.27.BTC at 7900.USD, "exchangeId1", "ourId1")
 
       Then("we send an order to buy 42.33.ETH")
-      verify(exchangeConnector).executeOnExchange(order(42.33.ETH at .03.BTC, "ourId2", Side.Bid))
+      exchangeConnector.executeOnExchange(order(42.33.ETH at .03.BTC, "ourId2", Side.Bid)) was called
 
       When("the market fills the second order")
       onMarketReport(42.33.ETH at .03.BTC, "exchangeId2", "ourId2")
 
       Then("we send an order to sell 42.33.ETH")
-      verify(exchangeConnector).executeOnExchange(order(42.33.ETH at 250.USD, "ourId3", Side.Ask))
+      exchangeConnector.executeOnExchange(order(42.33.ETH at 250.USD, "ourId3", Side.Ask)) was called
 
       When("the market fills the third order")
       onMarketReport(42.33.ETH at 250.USD, "exchangeId3", "ourId3")
