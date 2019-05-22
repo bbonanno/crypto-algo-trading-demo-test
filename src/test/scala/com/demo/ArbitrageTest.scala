@@ -27,19 +27,19 @@ class ArbitrageTest extends FeatureSpec with GivenWhenThen with IdiomaticMockito
       exchangeConnector.executeOnExchange(order(1.27.BTC at 7900.USD, OurId("ourId1"), Side.Bid)) was called
 
       When("the market fills the first order")
-      onMarketReport(1.27.BTC at 7900.USD, OurId("ourId1"), ExchangeId("exchangeId1"))
+      onMarketReport(1.27.BTC at 7900.USD, OurId("ourId1"))
 
       Then("we send an order to buy 42.33.ETH")
       exchangeConnector.executeOnExchange(order(42.33.ETH at .03.BTC, OurId("ourId2"), Side.Bid)) was called
 
       When("the market fills the second order")
-      onMarketReport(42.33.ETH at .03.BTC, OurId("ourId2"), ExchangeId("exchangeId2"))
+      onMarketReport(42.33.ETH at .03.BTC, OurId("ourId2"))
 
       Then("we send an order to sell 42.33.ETH")
       exchangeConnector.executeOnExchange(order(42.33.ETH at 250.USD, OurId("ourId3"), Side.Ask)) was called
 
       When("the market fills the third order")
-      onMarketReport(42.33.ETH at 250.USD, OurId("ourId3"), ExchangeId("exchangeId3"))
+      onMarketReport(42.33.ETH at 250.USD, OurId("ourId3"))
 
       Then("the balance is now bigger")
       oms.funds(USD) shouldBe 10582.5.USD

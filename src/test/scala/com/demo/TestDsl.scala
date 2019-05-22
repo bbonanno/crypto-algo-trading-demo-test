@@ -6,6 +6,7 @@ import org.scalactic.Equality
 import org.scalactic.TripleEquals._
 
 import scala.math.BigDecimal.RoundingMode
+import scala.util.Random
 
 trait TestDsl {
 
@@ -24,7 +25,7 @@ trait TestDsl {
   def onMarketData(currencyPair: CurrencyPair, bids: Seq[(Quantity, Rate)] = Seq.empty, asks: Seq[(Quantity, Rate)] = Seq.empty)(implicit oms: OMS) =
     oms onMessage MarketData(currencyPair, bids.map(priceLevel), asks.map(priceLevel))
 
-  def onMarketReport(qr: (Quantity, Rate), orderId: OurId, exchangeId: ExchangeId)(implicit oms: OMS) =
+  def onMarketReport(qr: (Quantity, Rate), orderId: OurId, exchangeId: ExchangeId = ExchangeId(Random.nextString(10)))(implicit oms: OMS) =
     oms onMessage MarketReport(orderId, exchangeId, qr._1, qr._2)
 }
 
