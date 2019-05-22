@@ -1,3 +1,4 @@
+
 name := "JBCN"
 
 version := "0.1"
@@ -13,6 +14,8 @@ scalacOptions ++= Seq(
   "-language:higherKinds,implicitConversions",
   "-Xfatal-warnings"
 )
+
+scalafmtOnCompile := true
 
 libraryDependencies += "io.estatico" %% "newtype" % "0.4.2"
 
