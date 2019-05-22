@@ -3,6 +3,7 @@ package com.demo
 import com.demo.exchange._
 import org.mockito.scalatest.MockitoSugar
 import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
+import Currency._
 
 class ArbitrageTest extends FeatureSpec with GivenWhenThen with MockitoSugar with Matchers {
 
@@ -13,53 +14,51 @@ class ArbitrageTest extends FeatureSpec with GivenWhenThen with MockitoSugar wit
 
     scenario("Triangular arbitrage") {
       Given("we have some money")
-      oms onMessage AvailableFunds(Seq(Quantity(10000, Currency("USD"))))
+      oms onMessage AvailableFunds(Seq(Quantity(10000, USD)))
 
       And("the following market data")
       oms onMessage MarketData(
-        CurrencyPair(Currency("BTC"), Currency("USD")),
-        Seq(PriceLevel(Quantity(10, Currency("BTC")), Rate(7899, CurrencyPair(Currency("BTC"), Currency("USD"))))),
-        Seq(PriceLevel(Quantity(10, Currency("BTC")), Rate(7900, CurrencyPair(Currency("BTC"), Currency("USD")))))
+        CurrencyPair(BTC, USD),
+        Seq(PriceLevel(Quantity(10, BTC), Rate(7899, CurrencyPair(BTC, USD)))),
+        Seq(PriceLevel(Quantity(10, BTC), Rate(7900, CurrencyPair(BTC, USD))))
       )
       oms onMessage MarketData(
-        CurrencyPair(Currency("ETH"), Currency("BTC")),
-        Seq(PriceLevel(Quantity(100, Currency("ETH")), Rate(.0299, CurrencyPair(Currency("ETH"), Currency("BTC"))))),
-        Seq(PriceLevel(Quantity(100, Currency("ETH")), Rate(.03, CurrencyPair(Currency("ETH"), Currency("BTC")))))
+        CurrencyPair(ETH, BTC),
+        Seq(PriceLevel(Quantity(100, ETH), Rate(.0299, CurrencyPair(ETH, BTC)))),
+        Seq(PriceLevel(Quantity(100, ETH), Rate(.03, CurrencyPair(ETH, BTC))))
       )
       oms onMessage MarketData(
-        CurrencyPair(Currency("ETH"), Currency("USD")),
-        Seq(PriceLevel(Quantity(50, Currency("ETH")), Rate(250, CurrencyPair(Currency("ETH"), Currency("USD"))))),
-        Seq(PriceLevel(Quantity(50, Currency("ETH")), Rate(251, CurrencyPair(Currency("ETH"), Currency("USD")))))
+        CurrencyPair(ETH, USD),
+        Seq(PriceLevel(Quantity(50, ETH), Rate(250, CurrencyPair(ETH, USD)))),
+        Seq(PriceLevel(Quantity(50, ETH), Rate(251, CurrencyPair(ETH, USD))))
       )
 
       Then("we send an order to buy 1.27.BTC")
       verify(exchangeConnector).executeOnExchange(
         Order(
-          Quantity(1.27, Currency("BTC")),
-          Rate(7900, CurrencyPair(Currency("BTC"), Currency("USD"))),
+          Quantity(1.27, BTC),
+          Rate(7900, CurrencyPair(BTC, USD)),
           "ourId1",
           Side.Bid
         ))
 
       When("the market fills the first order")
-      oms onMessage MarketReport("exchangeId1", "ourId1", Quantity(1.27, Currency("BTC")), Rate(7900, CurrencyPair(Currency("BTC"), Currency("USD"))))
+      oms onMessage MarketReport("exchangeId1", "ourId1", Quantity(1.27, BTC), Rate(7900, CurrencyPair(BTC, USD)))
 
       Then("we send an order to buy 42.33.ETH")
-      verify(exchangeConnector).executeOnExchange(
-        Order(Quantity(42.33, Currency("ETH")), Rate(.03, CurrencyPair(Currency("ETH"), Currency("BTC"))), "ourId2", Side.Bid))
+      verify(exchangeConnector).executeOnExchange(Order(Quantity(42.33, ETH), Rate(.03, CurrencyPair(ETH, BTC)), "ourId2", Side.Bid))
 
       When("the market fills the second order")
-      oms onMessage MarketReport("exchangeId2", "ourId2", Quantity(42.33, Currency("ETH")), Rate(.03, CurrencyPair(Currency("ETH"), Currency("BTC"))))
+      oms onMessage MarketReport("exchangeId2", "ourId2", Quantity(42.33, ETH), Rate(.03, CurrencyPair(ETH, BTC)))
 
       Then("we send an order to sell 42.33.ETH")
-      verify(exchangeConnector).executeOnExchange(
-        Order(Quantity(42.33, Currency("ETH")), Rate(250, CurrencyPair(Currency("ETH"), Currency("USD"))), "ourId3", Side.Ask))
+      verify(exchangeConnector).executeOnExchange(Order(Quantity(42.33, ETH), Rate(250, CurrencyPair(ETH, USD)), "ourId3", Side.Ask))
 
       When("the market fills the third order")
-      oms onMessage MarketReport("exchangeId3", "ourId3", Quantity(42.33, Currency("ETH")), Rate(250, CurrencyPair(Currency("ETH"), Currency("USD"))))
+      oms onMessage MarketReport("exchangeId3", "ourId3", Quantity(42.33, ETH), Rate(250, CurrencyPair(ETH, USD)))
 
       Then("the balance is now bigger")
-      oms.funds(Currency("USD")) shouldBe Quantity(10582.5, Currency("USD"))
+      oms.funds(USD) shouldBe Quantity(10582.5, USD)
     }
   }
 }

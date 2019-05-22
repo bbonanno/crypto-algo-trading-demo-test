@@ -3,6 +3,12 @@ package com
 package object demo {
 
   case class Currency(name: String)
+  object Currency {
+    val BTC = Currency("BTC")
+    val ETH = Currency("ETH")
+    val USD = Currency("USD")
+  }
+
   case class CurrencyPair(base: Currency, quote: Currency)
 
   case class Quantity(value: BigDecimal, currency: Currency) {
