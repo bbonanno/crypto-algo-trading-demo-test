@@ -24,21 +24,22 @@ class OMS(exchangeConnector: ExchangeConnector) {
       if (orderBooks.size == 3) {
         val f  = funds(Currency("USD"))
         val pl = orderBooks(CurrencyPair(Currency("BTC"), Currency("USD"))).asks.head
-        exchangeConnector.executeOnExchange(Order(f convert pl.rate, pl.rate, "ourId1", Side.Bid))
+        exchangeConnector.executeOnExchange(Order(f convert pl.rate, pl.rate, OurId("ourId1"), Side.Bid))
       }
 
     case MarketReport(orderId, _, filledBase, rate) =>
       orderId match {
-        case "ourId1" =>
+        case OurId("ourId1") =>
           updateFunds(filledBase)
           val pl = orderBooks(CurrencyPair(Currency("ETH"), Currency("BTC"))).asks.head
-          exchangeConnector.executeOnExchange(Order(filledBase convert pl.rate, pl.rate, "ourId2", Side.Bid))
-        case "ourId2" =>
+          exchangeConnector.executeOnExchange(Order(filledBase convert pl.rate, pl.rate, OurId("ourId2"), Side.Bid))
+        case OurId("ourId2") =>
           updateFunds(filledBase)
           val pl = orderBooks(CurrencyPair(Currency("ETH"), Currency("USD"))).bids.head
-          exchangeConnector.executeOnExchange(Order(filledBase, pl.rate, "ourId3", Side.Ask))
-        case "ourId3" =>
+          exchangeConnector.executeOnExchange(Order(filledBase, pl.rate, OurId("ourId3"), Side.Ask))
+        case OurId("ourId3") =>
           updateFunds(filledBase convert rate)
+        case _ =>
       }
   }
 }

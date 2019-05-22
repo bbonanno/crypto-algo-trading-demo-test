@@ -24,13 +24,13 @@ trait TestDsl {
   def onMarketData(currencyPair: CurrencyPair, bids: Seq[(Quantity, Rate)] = Seq.empty, asks: Seq[(Quantity, Rate)] = Seq.empty)(implicit oms: OMS) =
     oms onMessage MarketData(currencyPair, bids.map(priceLevel), asks.map(priceLevel))
 
-  def onMarketReport(qr: (Quantity, Rate), orderId: String, exchangeId: String)(implicit oms: OMS) =
+  def onMarketReport(qr: (Quantity, Rate), orderId: OurId, exchangeId: ExchangeId)(implicit oms: OMS) =
     oms onMessage MarketReport(orderId, exchangeId, qr._1, qr._2)
 }
 
 object TestBuilder {
 
-  def order(qr: (Quantity, Rate), orderId: String, side: Side): Order = Order(qr._1, qr._2, orderId, side)
+  def order(qr: (Quantity, Rate), orderId: OurId, side: Side): Order = Order(qr._1, qr._2, orderId, side)
 
   def priceLevel(qr: (Quantity, Rate)): PriceLevel = PriceLevel(qr._1, qr._2)
 }
