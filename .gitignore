@@ -1,0 +1,29 @@
+*.log
+**/*deleteme*
+*.orig
+tmp/
+# sbt specific
+.cache
+.lib/
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+.floo
+.flooignore
+*.swp
+
+# Scala-IDE specific
+.scala_dependencies
+.worksheet
+
+# intellij
+.idea/
+
+.DS_Store
+
+# worksheet files
+*.sc
+
