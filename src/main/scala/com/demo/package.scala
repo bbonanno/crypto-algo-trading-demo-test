@@ -2,7 +2,9 @@ package com
 
 package object demo {
 
-  case class Currency(name: String)
+  case class Currency(name: String) {
+    def /(quote: Currency): CurrencyPair = CurrencyPair(this, quote)
+  }
   object Currency {
     val BTC = Currency("BTC")
     val ETH = Currency("ETH")
