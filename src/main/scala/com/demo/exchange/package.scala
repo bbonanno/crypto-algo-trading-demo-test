@@ -1,9 +1,11 @@
 package com.demo
 
+import io.estatico.newtype.macros.newtype
+
 package object exchange {
 
-  case class ExchangeId(id: String) extends AnyVal
-  case class OurId(id: String)      extends AnyVal
+  @newtype case class ExchangeId(id: String)
+  @newtype(unapply = true) case class OurId(id: String)
 
   sealed trait Side
   object Side {

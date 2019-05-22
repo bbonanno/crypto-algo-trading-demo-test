@@ -1,8 +1,10 @@
 package com
 
+import io.estatico.newtype.macros.newtype
+
 package object demo {
 
-  case class Currency(name: String) extends AnyVal {
+  @newtype case class Currency(name: String) {
     def /(quote: Currency): CurrencyPair = CurrencyPair(this, quote)
   }
   object Currency {
