@@ -4,6 +4,7 @@ import com.demo.Currency._
 import com.demo.exchange._
 import org.mockito.scalatest.MockitoSugar
 import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
+import TestBuilder._
 
 class ArbitrageTest extends FeatureSpec with GivenWhenThen with MockitoSugar with Matchers with TestDsl {
 
@@ -17,27 +18,27 @@ class ArbitrageTest extends FeatureSpec with GivenWhenThen with MockitoSugar wit
       updateAvailableFunds(10000.USD)
 
       And("the following market data")
-      onMarketData(BTC / USD, asks = Seq(PriceLevel(10.BTC, Rate(7900, BTC / USD))))
-      onMarketData(ETH / BTC, asks = Seq(PriceLevel(100.ETH, Rate(.03, ETH / BTC))))
-      onMarketData(ETH / USD, bids = Seq(PriceLevel(50.ETH, Rate(250, ETH / USD))))
+      onMarketData(BTC / USD, asks = Seq(10.BTC at 7900.USD))
+      onMarketData(ETH / BTC, asks = Seq(100.ETH at .03.BTC))
+      onMarketData(ETH / USD, bids = Seq(50.ETH at 250.USD))
 
-      Then("we send an order to buy 1.27.BTC")
-      verify(exchangeConnector).executeOnExchange(Order(1.27.BTC, Rate(7900, BTC / USD), "ourId1", Side.Bid))
+      Then("we send an order to buy 1.27.BTC at 7900.USD")
+      verify(exchangeConnector).executeOnExchange(order(1.27.BTC at 7900.USD, "ourId1", Side.Bid))
 
       When("the market fills the first order")
-      onMarketReport(1.27.BTC, Rate(7900, BTC / USD), "exchangeId1", "ourId1")
+      onMarketReport(1.27.BTC at 7900.USD, "exchangeId1", "ourId1")
 
       Then("we send an order to buy 42.33.ETH")
-      verify(exchangeConnector).executeOnExchange(Order(42.33.ETH, Rate(.03, ETH / BTC), "ourId2", Side.Bid))
+      verify(exchangeConnector).executeOnExchange(order(42.33.ETH at .03.BTC, "ourId2", Side.Bid))
 
       When("the market fills the second order")
-      onMarketReport(42.33.ETH, Rate(.03, ETH / BTC), "exchangeId2", "ourId2")
+      onMarketReport(42.33.ETH at .03.BTC, "exchangeId2", "ourId2")
 
       Then("we send an order to sell 42.33.ETH")
-      verify(exchangeConnector).executeOnExchange(Order(42.33.ETH, Rate(250, ETH / USD), "ourId3", Side.Ask))
+      verify(exchangeConnector).executeOnExchange(order(42.33.ETH at 250.USD, "ourId3", Side.Ask))
 
       When("the market fills the third order")
-      onMarketReport(42.33.ETH, Rate(250, ETH / USD), "exchangeId3", "ourId3")
+      onMarketReport(42.33.ETH at 250.USD, "exchangeId3", "ourId3")
 
       Then("the balance is now bigger")
       oms.funds(USD) shouldBe 10582.5.USD
