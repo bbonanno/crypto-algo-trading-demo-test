@@ -2,7 +2,7 @@ package com
 
 package object demo {
 
-  case class Currency(name: String) {
+  case class Currency(name: String) extends AnyVal {
     def /(quote: Currency): CurrencyPair = CurrencyPair(this, quote)
   }
   object Currency {

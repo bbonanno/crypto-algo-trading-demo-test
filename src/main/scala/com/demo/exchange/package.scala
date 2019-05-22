@@ -2,8 +2,8 @@ package com.demo
 
 package object exchange {
 
-  case class ExchangeId(id: String)
-  case class OurId(id: String)
+  case class ExchangeId(id: String) extends AnyVal
+  case class OurId(id: String)      extends AnyVal
 
   sealed trait Side
   object Side {
