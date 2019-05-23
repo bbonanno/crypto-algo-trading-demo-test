@@ -1,11 +1,11 @@
 package com.demo
 
+import com.demo.Currency._
 import com.demo.exchange._
-import org.mockito.scalatest.MockitoSugar
+import org.mockito.scalatest.IdiomaticMockito
 import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
-import Currency._
 
-class ArbitrageTest extends FeatureSpec with GivenWhenThen with MockitoSugar with Matchers {
+class ArbitrageTest extends FeatureSpec with GivenWhenThen with IdiomaticMockito with Matchers {
 
   val exchangeConnector = mock[ExchangeConnector]
   val oms               = new OMS(exchangeConnector)
@@ -34,25 +34,19 @@ class ArbitrageTest extends FeatureSpec with GivenWhenThen with MockitoSugar wit
       )
 
       Then("we send an order to buy 1.27.BTC")
-      verify(exchangeConnector).executeOnExchange(
-        Order(
-          Quantity(1.27, BTC),
-          Rate(7900, CurrencyPair(BTC, USD)),
-          "ourId1",
-          Side.Bid
-        ))
+      exchangeConnector.executeOnExchange(Order(Quantity(1.27, BTC), Rate(7900, CurrencyPair(BTC, USD)), "ourId1", Side.Bid)) was called
 
       When("the market fills the first order")
       oms onMessage MarketReport("exchangeId1", "ourId1", Quantity(1.27, BTC), Rate(7900, CurrencyPair(BTC, USD)))
 
       Then("we send an order to buy 42.33.ETH")
-      verify(exchangeConnector).executeOnExchange(Order(Quantity(42.33, ETH), Rate(.03, CurrencyPair(ETH, BTC)), "ourId2", Side.Bid))
+      exchangeConnector.executeOnExchange(Order(Quantity(42.33, ETH), Rate(.03, CurrencyPair(ETH, BTC)), "ourId2", Side.Bid)) was called
 
       When("the market fills the second order")
       oms onMessage MarketReport("exchangeId2", "ourId2", Quantity(42.33, ETH), Rate(.03, CurrencyPair(ETH, BTC)))
 
       Then("we send an order to sell 42.33.ETH")
-      verify(exchangeConnector).executeOnExchange(Order(Quantity(42.33, ETH), Rate(250, CurrencyPair(ETH, USD)), "ourId3", Side.Ask))
+      exchangeConnector.executeOnExchange(Order(Quantity(42.33, ETH), Rate(250, CurrencyPair(ETH, USD)), "ourId3", Side.Ask)) was called
 
       When("the market fills the third order")
       oms onMessage MarketReport("exchangeId3", "ourId3", Quantity(42.33, ETH), Rate(250, CurrencyPair(ETH, USD)))
