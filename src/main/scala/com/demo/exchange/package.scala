@@ -12,7 +12,7 @@ package object exchange {
 
   case class MarketData(currencyPair: CurrencyPair, bids: Seq[PriceLevel], asks: Seq[PriceLevel]) extends Message
 
-  case class MarketReport(orderId: String, exchangeId: String, filledBase: Quantity, rate: Rate) extends Message
+  case class MarketReport(orderId: String, exchangeId: String, filledBase: Quantity, rate: Price) extends Message
 
   case class AvailableFunds(funds: Seq[Quantity]) extends Message
 
