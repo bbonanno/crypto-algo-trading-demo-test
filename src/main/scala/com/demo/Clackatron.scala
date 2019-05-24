@@ -5,7 +5,7 @@ import com.demo.exchange._
 /**
   * Completely hardcoded and not at all production ready implementation just to make the tests pass
   */
-class OMS(exchangeConnector: ExchangeConnector) {
+class Clackatron(exchangeConnector: ExchangeConnector) {
 
   var funds: Map[Currency, Quantity]           = Map.empty
   var orderBooks: Map[CurrencyPair, OrderBook] = Map.empty
@@ -24,21 +24,22 @@ class OMS(exchangeConnector: ExchangeConnector) {
       if (orderBooks.size == 3) {
         val f  = funds(Currency("USD"))
         val pl = orderBooks(CurrencyPair(Currency("BTC"), Currency("USD"))).asks.head
-        exchangeConnector.executeOnExchange(Order(f convert pl.rate, pl.rate, "ourId1", Side.Bid))
+        exchangeConnector.executeOnExchange(Order(f convert pl.rate, pl.rate, ClackatronOrderId("cid1"), Side.Bid))
       }
 
     case MarketReport(orderId, _, filledBase, rate) =>
       orderId match {
-        case "ourId1" =>
+        case ClackatronOrderId("cid1") =>
           updateFunds(filledBase)
           val pl = orderBooks(CurrencyPair(Currency("ETH"), Currency("BTC"))).asks.head
-          exchangeConnector.executeOnExchange(Order(filledBase convert pl.rate, pl.rate, "ourId2", Side.Bid))
-        case "ourId2" =>
+          exchangeConnector.executeOnExchange(Order(filledBase convert pl.rate, pl.rate, ClackatronOrderId("cid2"), Side.Bid))
+        case ClackatronOrderId("cid2") =>
           updateFunds(filledBase)
           val pl = orderBooks(CurrencyPair(Currency("ETH"), Currency("USD"))).bids.head
-          exchangeConnector.executeOnExchange(Order(filledBase, pl.rate, "ourId3", Side.Ask))
-        case "ourId3" =>
+          exchangeConnector.executeOnExchange(Order(filledBase, pl.rate, ClackatronOrderId("cid3"), Side.Ask))
+        case ClackatronOrderId("cid3") =>
           updateFunds(filledBase convert rate)
+        case _ =>
       }
   }
 }
