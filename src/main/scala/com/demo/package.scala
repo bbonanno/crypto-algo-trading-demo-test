@@ -22,6 +22,6 @@ package object demo {
   }
   case class Price(value: BigDecimal, ccyPair: CurrencyPair)
 
-  case class PriceLevel(quantity: Quantity, rate: Price)
+  case class PriceLevel(quantity: Quantity, price: Price)
   case class OrderBook(bids: Seq[PriceLevel], asks: Seq[PriceLevel])
 }

@@ -24,21 +24,21 @@ class Clackatron(exchangeConnector: ExchangeConnector) {
       if (orderBooks.size == 3) {
         val f  = funds(Currency("USD"))
         val pl = orderBooks(CurrencyPair(Currency("BTC"), Currency("USD"))).asks.head
-        exchangeConnector.executeOnExchange(Order(f convert pl.rate, pl.rate, ClackatronOrderId("cid1"), Side.Bid))
+        exchangeConnector.executeOnExchange(Order(f convert pl.price, pl.price, ClackatronOrderId("cid1"), Side.Bid))
       }
 
-    case MarketReport(orderId, _, filledBase, rate) =>
+    case MarketReport(orderId, _, filledBase, price) =>
       orderId match {
         case ClackatronOrderId("cid1") =>
           updateFunds(filledBase)
           val pl = orderBooks(CurrencyPair(Currency("ETH"), Currency("BTC"))).asks.head
-          exchangeConnector.executeOnExchange(Order(filledBase convert pl.rate, pl.rate, ClackatronOrderId("cid2"), Side.Bid))
+          exchangeConnector.executeOnExchange(Order(filledBase convert pl.price, pl.price, ClackatronOrderId("cid2"), Side.Bid))
         case ClackatronOrderId("cid2") =>
           updateFunds(filledBase)
           val pl = orderBooks(CurrencyPair(Currency("ETH"), Currency("USD"))).bids.head
-          exchangeConnector.executeOnExchange(Order(filledBase, pl.rate, ClackatronOrderId("cid3"), Side.Ask))
+          exchangeConnector.executeOnExchange(Order(filledBase, pl.price, ClackatronOrderId("cid3"), Side.Ask))
         case ClackatronOrderId("cid3") =>
-          updateFunds(filledBase convert rate)
+          updateFunds(filledBase convert price)
         case _ =>
       }
   }

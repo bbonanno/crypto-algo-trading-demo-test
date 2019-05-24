@@ -15,7 +15,7 @@ package object exchange {
 
   case class MarketData(currencyPair: CurrencyPair, bids: Seq[PriceLevel], asks: Seq[PriceLevel]) extends Message
 
-  case class MarketReport(orderId: ClackatronOrderId, exchangeId: ExchangeOrderId, filledBase: Quantity, rate: Price) extends Message
+  case class MarketReport(orderId: ClackatronOrderId, exchangeId: ExchangeOrderId, filledBase: Quantity, price: Price) extends Message
 
   case class AvailableFunds(funds: Seq[Quantity]) extends Message
 
