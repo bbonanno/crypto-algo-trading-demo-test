@@ -15,6 +15,8 @@ scalacOptions ++= Seq(
   "-Xfatal-warnings"
 )
 
+addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
+
 scalafmtOnCompile := true
 
 libraryDependencies += "io.estatico" %% "newtype" % "0.4.2"
